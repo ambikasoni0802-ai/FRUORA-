@@ -5,12 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.item
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
@@ -83,102 +83,100 @@ fun HomeScreen(
                 }
             }
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
+            val results = viewModel.displayedFruits
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(bottom = 100.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+                modifier = Modifier.fillMaxSize().weight(1f)
             ) {
                 if (viewModel.searchQuery.isBlank()) {
-                    LazyRow(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        items(FruitRepository.categories) { category ->
-                            val isActive = category == viewModel.selectedCategory
-                            Surface(
-                                shape = RoundedCornerShape(18.dp),
-                                color = if (isActive) PinkMid else Color.White,
-                                shadowElevation = 3.dp,
-                                modifier = Modifier.clickable { viewModel.onCategorySelected(category) }
-                            ) {
-                                Text(
-                                    text = category,
-                                    color = if (isActive) Color.White else PinkMid,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 13.sp,
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 9.dp)
-                                )
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        LazyRow(
+                            modifier = Modifier.padding(vertical = 12.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            items(FruitRepository.categories) { category ->
+                                val isActive = category == viewModel.selectedCategory
+                                Surface(
+                                    shape = RoundedCornerShape(18.dp),
+                                    color = if (isActive) PinkMid else Color.White,
+                                    shadowElevation = 3.dp,
+                                    modifier = Modifier.clickable { viewModel.onCategorySelected(category) }
+                                ) {
+                                    Text(
+                                        text = category,
+                                        color = if (isActive) Color.White else PinkMid,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp,
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 9.dp)
+                                    )
+                                }
                             }
                         }
                     }
 
-                    Surface(
-                        shape = RoundedCornerShape(24.dp),
-                        color = Color(0xFF9EE6C4),
-                        shadowElevation = 4.dp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .padding(bottom = 4.dp)
-                    ) {
-                        Row(
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Surface(
+                            shape = RoundedCornerShape(24.dp),
+                            color = Color(0xFF9EE6C4),
+                            shadowElevation = 4.dp,
                             modifier = Modifier
-                                .background(Brush.linearGradient(listOf(Color(0xFF9EE6C4), Color(0xFFDCEDC1))))
-                                .padding(horizontal = 20.dp, vertical = 18.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .padding(bottom = 4.dp)
                         ) {
-                            Column {
-                                Text("Fresh Picks!", color = Color(0xFF1F6B4D), fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                                Text("Farm to home, same day 🌱", color = Color(0xFF3F8E6A), fontSize = 12.sp)
+                            Row(
+                                modifier = Modifier
+                                    .background(Brush.linearGradient(listOf(Color(0xFF9EE6C4), Color(0xFFDCEDC1))))
+                                    .padding(horizontal = 20.dp, vertical = 18.dp)
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
+                                    Text("Fresh Picks!", color = Color(0xFF1F6B4D), fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                                    Text("Farm to home, same day 🌱", color = Color(0xFF3F8E6A), fontSize = 12.sp)
+                                }
+                                Text("🍉", fontSize = 38.sp)
                             }
-                            Text("🍉", fontSize = 38.sp)
                         }
                     }
                 }
 
-                val results = viewModel.displayedFruits
-
-                Text(
-                    text = if (viewModel.searchQuery.isNotBlank())
-                        "Results for \"${viewModel.searchQuery}\" (${results.size})"
-                    else
-                        "🍊 ${viewModel.selectedCategory} Fruits",
-                    fontWeight = FontWeight.Bold,
-                    color = TextBrown,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
-                )
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Text(
+                        text = if (viewModel.searchQuery.isNotBlank())
+                            "Results for \"${viewModel.searchQuery}\" (${results.size})"
+                        else
+                            "🍊 ${viewModel.selectedCategory} Fruits",
+                        fontWeight = FontWeight.Bold,
+                        color = TextBrown,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+                    )
+                }
 
                 if (results.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth().padding(32.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("No fruit found. Try a different search 🍉", color = TextBrown)
-                    }
-                } else {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 400.dp)
-                    ) {
-                        items(results) { fruit ->
-                            FruitCard(
-                                fruit = fruit,
-                                onClick = { onFruitClick(fruit) },
-                                onAddToCart = { viewModel.addToCart(fruit) }
-                            )
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No fruit found. Try a different search 🍉", color = TextBrown)
                         }
                     }
+                } else {
+                    items(results) { fruit ->
+                        FruitCard(
+                            fruit = fruit,
+                            onClick = { onFruitClick(fruit) },
+                            onAddToCart = { viewModel.addToCart(fruit) }
+                        )
+                    }
                 }
-
-                Spacer(Modifier.height(90.dp))
             }
         }
 
