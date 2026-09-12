@@ -14,12 +14,6 @@ import com.fruitapp.ui.theme.PinkMid
 import com.fruitapp.ui.theme.TextBrown
 import com.fruitapp.viewmodel.CartViewModel
 
-/**
- * Shown while Razorpay checkout is launching/processing.
- * The actual Razorpay Checkout.open() call happens in MainActivity (it must be
- * triggered from an Activity implementing PaymentResultListener), which is
- * passed in here as `launchRazorpay`.
- */
 @Composable
 fun PaymentScreen(
     viewModel: CartViewModel,
