@@ -6,7 +6,9 @@
 
     <application
         android:allowBackup="true"
-        android:label="Fruit App"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
         android:theme="@style/Theme.FruitApp"
         android:usesCleartextTraffic="false">
 
@@ -19,12 +21,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Razorpay requires this for payment callback handling -->
-        <activity
-            android:name="com.razorpay.CheckoutActivity"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:exported="false" />
 
     </application>
 </manifest>
