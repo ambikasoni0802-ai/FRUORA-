@@ -8,7 +8,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
@@ -38,7 +40,6 @@ fun HomeScreen(
         FallingFruitsBackground(modifier = Modifier.fillMaxSize())
 
         Column(modifier = Modifier.fillMaxSize()) {
-            // Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -82,8 +83,11 @@ fun HomeScreen(
                 }
             }
 
-            Column(modifier = Modifier.weight(1f).verticalScrollFix()) {
-                // Categories
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 if (viewModel.searchQuery.isBlank()) {
                     LazyRow(
                         modifier = Modifier.padding(vertical = 12.dp),
@@ -109,7 +113,6 @@ fun HomeScreen(
                         }
                     }
 
-                    // Fresh Picks banner (matches web design)
                     Surface(
                         shape = RoundedCornerShape(24.dp),
                         color = Color(0xFF9EE6C4),
@@ -179,7 +182,6 @@ fun HomeScreen(
             }
         }
 
-        // Bottom navigation bar (matches web design)
         Surface(
             shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp),
             color = Color.White,
@@ -214,11 +216,6 @@ private fun BottomNavItem(icon: String, label: String, isActive: Boolean, onClic
         )
     }
 }
-
-@Composable
-private fun Modifier.verticalScrollFix(): Modifier = this.then(
-    androidx.compose.foundation.verticalScroll(androidx.compose.foundation.rememberScrollState())
-)
 
 @Composable
 private fun FruitCard(fruit: Fruit, onClick: () -> Unit, onAddToCart: () -> Unit) {
