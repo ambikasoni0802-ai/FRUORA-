@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.random.Random
@@ -24,7 +25,6 @@ fun FruitSLogo(
         val sx = w / 100f
         val sy = h / 100f
 
-        // Same S-curve as the web design (100x100 viewBox)
         val path = Path().apply {
             moveTo(78f * sx, 20f * sy)
             cubicTo(78f * sx, 5f * sy, 22f * sx, 5f * sy, 22f * sx, 27f * sy)
