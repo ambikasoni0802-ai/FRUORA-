@@ -42,7 +42,7 @@ fun SplashScreen(onFinished: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
         ) {
-            FruitSLogo(sizeDp = 90)
+            FruitSLogo(sizeDp = 90.dp)
             Text(
                 text = "Fresh fruits, delivered fast",
                 fontSize = 14.sp,
