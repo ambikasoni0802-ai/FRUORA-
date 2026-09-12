@@ -1,6 +1,7 @@
 package com.fruitapp.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -188,7 +189,3 @@ private fun FruitCard(fruit: Fruit, onClick: () -> Unit, onAddToCart: () -> Unit
         }
     }
 }
-
-// Small helper to keep `.clickable` usage concise above without extra imports scattered around
-private fun Modifier.clickable(onClick: () -> Unit): Modifier =
-    this.then(androidx.compose.foundation.clickable(onClick = onClick))
