@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fruit App</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family: 'Baloo 2','Comic Sans MS','Arial Rounded MT Bold', sans-serif; }
+  html, body { height:100%; }
+  body {
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,193,140,0.35), transparent 40%),
+      radial-gradient(circle at 85% 20%, rgba(255,150,200,0.3), transparent 45%),
+      linear-gradient(180deg, #FFF9F0 0%, #FFF1E4 35%, #FFE7F1 100%);
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Continuous falling fruit background layer - GIF-style loop */
+  #fruit-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .fruit {
+    position: absolute;
+    top: -60px;
+    animation: fall linear infinite;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+  }
+  @keyframes fall {
+    0%   { transform: translateY(-10vh) translateX(0) rotate(0deg); }
+    50%  { transform: translateY(50vh) translateX(15px) rotate(180deg); }
+    100% { transform: translateY(115vh) translateX(-10px) rotate(360deg); }
+  }
+
+  .app-container {
+    position: relative;
+    z-index: 2;
+    max-width: 420px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: rgba(255,255,255,0.45);
+    backdrop-filter: blur(6px);
+  }
+
+  header {
+    background: linear-gradient(135deg, #FFB347 0%, #FF6F91 55%, #C86DD7 100%);
+    padding: 18px 16px 24px;
+    border-radius: 0 0 32px 32px;
+    box-shadow: 0 8px 20px rgba(255,111,145,0.35);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  header .top-row { display:flex; align-items:center; justify-content:space-between; }
+  header h1 { font-size: 22px; text-shadow: 1px 2px 0 rgba(0,0,0,0.12); display:flex; align-items:center; gap:8px; }
+  .logo-s {
+    position: relative;
+    display:inline-flex; align-items:center; justify-content:center;
+    width: 46px; height: 46px;
+  }
+  .logo-s svg { width: 100%; height: 100%; overflow: visible; }
+  .logo-s .fruit-pt {
+    font-size: 6px;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.25));
+  }
+  header .cart-icon {
+    background: rgba(255,255,255,0.9); color: #FF6F91;
+    width: 40px; height:40px; border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 18px; box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+    position: relative;
+  }
+  .cart-icon .badge-count {
+    position:absolute; top:-4px; right:-4px;
+    background:#4CD964; color:white; font-size:10px; font-weight:bold;
+    width:16px; height:16px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .search-bar {
+    margin-top: 14px; background: rgba(255,255,255,0.95);
+    border-radius: 22px; padding: 11px 18px;
+    display:flex; align-items:center; gap:8px; color: #aaa; font-size: 14px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  }
+
+  .categories { display:flex; gap:10px; overflow-x:auto; padding: 16px; scrollbar-width: none; }
+  .categories::-webkit-scrollbar { display:none; }
+  .category-pill {
+    flex-shrink:0; background: white; border-radius: 18px; padding: 9px 16px;
+    font-size: 13px; font-weight:bold; color: #FF6F91;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    display:flex; align-items:center; gap:6px; white-space:nowrap;
+  }
+  .category-pill.active { background: linear-gradient(135deg, #FFB347, #FF6F91); color: white; }
+
+  .banner {
+    margin: 0 16px 18px; background: linear-gradient(135deg, #9EE6C4, #DCEDC1);
+    border-radius: 24px; padding: 18px 20px;
+    display:flex; align-items:center; justify-content:space-between;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+  }
+  .banner .text h2 { color: #1F6B4D; font-size: 18px; margin-bottom:4px; }
+  .banner .text p { color: #3f8e6a; font-size: 12px; }
+  .banner .emoji { font-size: 42px; animation: bounce 2.4s ease-in-out infinite; }
+
+  .section-title {
+    padding: 0 16px; font-size: 16px; font-weight: bold; color: #5A3E2B;
+    margin: 18px 0 10px; display:flex; align-items:center; gap:6px;
+  }
+
+  .grid { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 0 16px; }
+  .card {
+    background: rgba(255,255,255,0.92); border-radius: 22px; padding: 14px;
+    text-align:center; box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+    position: relative; transition: transform .2s;
+  }
+  .card:hover { transform: translateY(-4px); }
+  .card .fruit-emoji { font-size: 44px; margin-bottom: 6px; display:inline-block; animation: bounce 2.6s ease-in-out infinite; }
+  .grid .card:nth-child(2n) .fruit-emoji { animation-delay: .3s; }
+  .grid .card:nth-child(3n) .fruit-emoji { animation-delay: .6s; }
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .card h3 { font-size: 13.5px; color: #5A3E2B; margin-bottom:2px; }
+  .card .price { color: #FF6F91; font-weight:bold; font-size: 13.5px; margin-bottom:8px; }
+  .card .badge {
+    position:absolute; top:8px; left:8px; background:#A8E6CF; color:#1F6B4D;
+    font-size:9.5px; font-weight:bold; padding:3px 8px; border-radius:10px;
+  }
+  .card .badge.exotic { background:#FFD3E0; color:#C2185B; }
+  .add-btn {
+    background: linear-gradient(135deg, #FFB347, #FF6F91); color:white; border:none;
+    padding: 7px 18px; border-radius: 16px; font-size: 12.5px; font-weight:bold;
+    box-shadow: 0 4px 8px rgba(255,111,145,0.4);
+  }
+
+  .footer-space { height: 100px; }
+
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; max-width: 420px; margin: 0 auto;
+    background: rgba(255,255,255,0.97); backdrop-filter: blur(8px);
+    border-radius: 26px 26px 0 0; display:flex; justify-content:space-around;
+    padding: 12px 0 16px; box-shadow: 0 -6px 16px rgba(0,0,0,0.1); z-index: 20;
+  }
+  .nav-item { text-align:center; font-size: 11px; color:#ccc; }
+  .nav-item.active { color: #FF6F91; font-weight:bold; }
+  .nav-item .icon { font-size: 20px; display:block; margin-bottom:2px; }
+</style>
+</head>
+<body>
+
+<div id="fruit-bg"></div>
+
+<div class="app-container">
+  <header>
+    <div class="top-row">
+      <h1><span class="logo-s" id="fruit-s-logo"></span></h1>
+      <div class="cart-icon">🛒<span class="badge-count">3</span></div>
+    </div>
+    <div class="search-bar">🔍 Search fresh fruits...</div>
+  </header>
+
+  <div class="categories">
+    <div class="category-pill active">🍎 All</div>
+    <div class="category-pill">🍌 Seasonal</div>
+    <div class="category-pill">🥭 Exotic</div>
+    <div class="category-pill">🍇 Berries</div>
+    <div class="category-pill">🍈 Melons</div>
+    <div class="category-pill">🥥 Tropical</div>
+    <div class="category-pill">🌰 Dry Fruits</div>
+  </div>
+
+  <div class="banner">
+    <div class="text">
+      <h2>Fresh Picks!</h2>
+      <p>Farm to home, same day 🌱</p>
+    </div>
+    <div class="emoji">🍉</div>
+  </div>
+
+  <div class="section-title">🍊 Popular Fruits</div>
+  <div class="grid" id="popular-grid"></div>
+
+  <div class="section-title">🌍 Fruits From Around The World</div>
+  <div class="grid" id="world-grid"></div>
+
+  <div class="footer-space"></div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active"><span class="icon">🏠</span>Home</div>
+    <div class="nav-item"><span class="icon">🍇</span>Fruits</div>
+    <div class="nav-item"><span class="icon">🛒</span>Cart</div>
+    <div class="nav-item"><span class="icon">👤</span>Profile</div>
+  </div>
+</div>
+
+<script>
+  // Seamless continuous falling-fruit background (GIF-style infinite loop)
+  const fallEmojis = ['🍎','🍌','🍇','🍓','🍊','🍉','🥝','🍍','🥭','🍒','🍑','🍋','🫐','🍐'];
+  const bg = document.getElementById('fruit-bg');
+  const FRUIT_COUNT = 30;
+
+  for (let i = 0; i < FRUIT_COUNT; i++) {
+    spawnFruit(true);
+  }
+
+  function spawnFruit(initial) {
+    const el = document.createElement('span');
+    el.className = 'fruit';
+    el.textContent = fallEmojis[Math.floor(Math.random()*fallEmojis.length)];
+    const size = 18 + Math.random()*22;
+    const duration = 7 + Math.random()*9;
+    el.style.left = Math.random()*100 + 'vw';
+    el.style.fontSize = size + 'px';
+    el.style.animationDuration = duration + 's';
+    el.style.animationDelay = initial ? (-Math.random()*duration) + 's' : '0s';
+    bg.appendChild(el);
+
+    // Recycle: when animation ends, respawn a fresh one to keep loop endless
+    el.addEventListener('animationiteration', () => {
+      el.textContent = fallEmojis[Math.floor(Math.random()*fallEmojis.length)];
+      el.style.left = Math.random()*100 + 'vw';
+    });
+  }
+
+  const popular = [
+    {e:'🍎', n:'Apple', p:'₹120/kg', badge:'New'},
+    {e:'🍌', n:'Banana', p:'₹50/dozen'},
+    {e:'🍇', n:'Grapes', p:'₹90/kg', badge:'Hot'},
+    {e:'🍊', n:'Orange', p:'₹80/kg'},
+  ];
+
+  const world = [
+    {e:'🥭', n:'Mango', p:'₹150/kg', badge:'Exotic', ex:true},
+    {e:'🍍', n:'Pineapple', p:'₹60/pc'},
+    {e:'🥝', n:'Kiwi', p:'₹200/kg', badge:'Exotic', ex:true},
+    {e:'🍑', n:'Peach', p:'₹180/kg'},
+    {e:'🍒', n:'Cherry', p:'₹450/kg', badge:'Exotic', ex:true},
+    {e:'🍋', n:'Lemon', p:'₹40/kg'},
+    {e:'🍈', n:'Melon', p:'₹45/kg'},
+    {e:'🍉', n:'Watermelon', p:'₹35/kg'},
+    {e:'🥥', n:'Coconut', p:'₹40/pc'},
+    {e:'🫐', n:'Blueberry', p:'₹350/box', badge:'Exotic', ex:true},
+    {e:'🍐', n:'Pear', p:'₹130/kg'},
+    {e:'🍏', n:'Green Apple', p:'₹140/kg'},
+    {e:'🥑', n:'Avocado', p:'₹220/kg', badge:'Exotic', ex:true},
+    {e:'🍅', n:'Tomato', p:'₹30/kg'},
+    {e:'🫒', n:'Olive', p:'₹300/box', badge:'Exotic', ex:true},
+    {e:'🍆', n:'Dragon Fruit', p:'₹250/kg', badge:'Exotic', ex:true},
+    {e:'🍇', n:'Litchi', p:'₹180/kg', badge:'Seasonal'},
+    {e:'🌰', n:'Pomegranate', p:'₹160/kg'},
+  ];
+
+  function renderGrid(id, items) {
+    const grid = document.getElementById(id);
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        ${item.badge ? `<div class="badge ${item.ex ? 'exotic' : ''}">${item.badge}</div>` : ''}
+        <div class="fruit-emoji">${item.e}</div>
+        <h3>${item.n}</h3>
+        <div class="price">${item.p}</div>
+        <button class="add-btn">+ Add</button>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  renderGrid('popular-grid', popular);
+  renderGrid('world-grid', world);  // Build "S" logo out of fruit emojis placed along an S-curve path
+  (function buildFruitS() {
+    const container = document.getElementById('fruit-s-logo');
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 100 100');
+
+    // Path describing an "S" curve
+    const path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('id', 's-path');
+    path.setAttribute('d', 'M 78 20 C 78 5, 22 5, 22 27 C 22 48, 78 48, 78 68 C 78 90, 22 90, 22 78');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', 'none');
+    svg.appendChild(path);
+    container.appendChild(svg);
+
+    const fruits = ['🍎','🍓','🍇','🍊','🍌','🍒','🍋','🍍','🥝','🍑'];
+    const pathLength = path.getTotalLength();
+    const fruitCount = 100;
+
+    for (let i = 0; i < fruitCount; i++) {
+      const dist = (i / (fruitCount - 1)) * pathLength;
+      const pt = path.getPointAtLength(dist);
+      // slight look-ahead point to find the tangent direction for perpendicular offset
+      const pt2 = path.getPointAtLength(Math.min(dist + 0.5, pathLength));
+      const dx = pt2.x - pt.x, dy = pt2.y - pt.y;
+      const len = Math.sqrt(dx*dx + dy*dy) || 1;
+      const nx = -dy / len, ny = dx / len; // normal vector
+      const jitter = (Math.random() - 0.5) * 6; // spread across S thickness
+      const fx = pt.x + nx * jitter;
+      const fy = pt.y + ny * jitter;
+
+      const fo = document.createElementNS(svgNS, 'foreignObject');
+      fo.setAttribute('x', fx - 5);
+      fo.setAttribute('y', fy - 5);
+      fo.setAttribute('width', 10);
+      fo.setAttribute('height', 10);
+      const span = document.createElement('span');
+      span.className = 'fruit-pt';
+      span.textContent = fruits[i % fruits.length];
+      fo.appendChild(span);
+      svg.appendChild(fo);
+    }
+  })();
+</script>
+
+</body>
+</html>
