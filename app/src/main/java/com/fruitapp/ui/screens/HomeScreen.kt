@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fruitapp.data.Fruit
 import com.fruitapp.data.FruitRepository
+import com.fruitapp.ui.components.DeliveryDetailsDialog
 import com.fruitapp.ui.components.FallingFruitsBackground
 import com.fruitapp.ui.components.FruitSLogo
 import com.fruitapp.ui.theme.*
@@ -173,7 +174,7 @@ fun HomeScreen(
                         FruitCard(
                             fruit = fruit,
                             onClick = { onFruitClick(fruit) },
-                            onAddToCart = { viewModel.addToCart(fruit) }
+                            onAddToCart = { viewModel.requestAddToCart(fruit) }
                         )
                     }
                 }
@@ -195,6 +196,19 @@ fun HomeScreen(
                 BottomNavItem("🛒", "Cart", isActive = false) { onCartClick() }
                 BottomNavItem("👤", "Profile", isActive = false) { onProfileClick() }
             }
+        }
+
+        val pending = viewModel.pendingFruit
+        if (pending != null) {
+            DeliveryDetailsDialog(
+                initialName = viewModel.deliveryName,
+                initialPhone = viewModel.deliveryPhone,
+                initialAddress = viewModel.deliveryAddress,
+                onConfirm = { name, phone, address ->
+                    viewModel.confirmDeliveryDetailsAndAddToCart(name, phone, address)
+                },
+                onDismiss = { viewModel.cancelPendingAddToCart() }
+            )
         }
     }
 }
