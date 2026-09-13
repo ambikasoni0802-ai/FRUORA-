@@ -5,16 +5,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.fruitapp.data.FruitRepository
-import com.fruitapp.data.PaymentMethod
 import com.fruitapp.ui.Routes
 import com.fruitapp.ui.screens.*
 import com.fruitapp.ui.theme.FruitAppTheme
@@ -27,17 +22,18 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
 
     private val cartViewModel: CartViewModel by viewModels()
 
-    // Set these to your real Razorpay key before release.
-    // Test key placeholder — replace with your own from the Razorpay dashboard.
     private val razorpayKeyId = "rzp_test_XXXXXXXXXXXX"
 
-    // Bridges Razorpay's static callback back into Compose navigation
     private var onPaymentSuccess: (() -> Unit)? = null
     private var onPaymentFailure: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Checkout.preload(applicationContext)
+        try {
+            Checkout.preload(applicationContext)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         setContent {
             FruitAppTheme {
@@ -70,7 +66,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                 put("name", "Fruit App")
                 put("description", "Fruit order payment")
                 put("currency", "INR")
-                put("amount", amountInPaise) // amount in paise
+                put("amount", amountInPaise)
                 put("prefill", JSONObject().apply {
                     put("contact", cartViewModel.deliveryPhone)
                 })
@@ -81,7 +77,6 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
         }
     }
 
-    // ---- Razorpay PaymentResultListener callbacks ----
     override fun onPaymentSuccess(razorpayPaymentId: String?) {
         cartViewModel.placeOrder()
         cartViewModel.onOrderCompleted()
@@ -111,7 +106,8 @@ fun AppNavGraph(
             HomeScreen(
                 viewModel = viewModel,
                 onFruitClick = { fruit -> navController.navigate(Routes.productDetail(fruit.id)) },
-                onCartClick = { navController.navigate(Routes.CART) }
+                onCartClick = { navController.navigate(Routes.CART) },
+                onProfileClick = { navController.navigate(Routes.PROFILE) }
             )
         }
 
@@ -160,6 +156,13 @@ fun AppNavGraph(
                 onBackToHome = {
                     navController.navigate(Routes.HOME) { popUpTo(Routes.HOME) { inclusive = true } }
                 }
+            )
+        }
+
+        composable(Routes.PROFILE) {
+            ProfileScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
             )
         }
     }
