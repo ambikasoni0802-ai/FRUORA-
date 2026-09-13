@@ -40,6 +40,14 @@ fun CheckoutScreen(
         Spacer(Modifier.height(8.dp))
 
         OutlinedTextField(
+            value = viewModel.deliveryName,
+            onValueChange = { viewModel.onDeliveryNameChange(it) },
+            label = { Text("Full Name") },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(14.dp)
+        )
+        Spacer(Modifier.height(10.dp))
+        OutlinedTextField(
             value = viewModel.deliveryAddress,
             onValueChange = { viewModel.onAddressChange(it) },
             label = { Text("Delivery Address") },
@@ -81,7 +89,8 @@ fun CheckoutScreen(
 
         Spacer(Modifier.weight(1f))
 
-        val isFormValid = viewModel.deliveryAddress.isNotBlank() && viewModel.deliveryPhone.isNotBlank()
+        val isFormValid = viewModel.deliveryName.isNotBlank() &&
+            viewModel.deliveryAddress.isNotBlank() && viewModel.deliveryPhone.isNotBlank()
 
         Button(
             onClick = {
