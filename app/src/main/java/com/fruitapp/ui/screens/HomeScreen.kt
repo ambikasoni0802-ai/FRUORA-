@@ -33,7 +33,8 @@ import com.fruitapp.viewmodel.CartViewModel
 fun HomeScreen(
     viewModel: CartViewModel,
     onFruitClick: (Fruit) -> Unit,
-    onCartClick: () -> Unit
+    onCartClick: () -> Unit,
+    onProfileClick: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize().background(BgTop)) {
         FallingFruitsBackground(modifier = Modifier.fillMaxSize())
@@ -190,9 +191,9 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 BottomNavItem("🏠", "Home", isActive = true) {}
-                BottomNavItem("🍇", "Fruits", isActive = false) {}
+                BottomNavItem("🍇", "Fruits", isActive = false) { viewModel.onCategorySelected("All") }
                 BottomNavItem("🛒", "Cart", isActive = false) { onCartClick() }
-                BottomNavItem("👤", "Profile", isActive = false) {}
+                BottomNavItem("👤", "Profile", isActive = false) { onProfileClick() }
             }
         }
     }
