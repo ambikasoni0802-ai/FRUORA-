@@ -9,4 +9,5 @@ object Routes {
     const val CHECKOUT = "checkout"
     const val PAYMENT = "payment"
     const val ORDER_SUCCESS = "order_success"
+    const val PROFILE = "profile"
 }
