@@ -32,7 +32,7 @@ class CartViewModel : ViewModel() {
 
     fun onCategorySelected(category: String) {
         selectedCategory = category
-        searchQuery = "" // clear search when browsing by category
+        searchQuery = ""
     }
 
     // ---- Cart state ----
@@ -114,4 +114,22 @@ class CartViewModel : ViewModel() {
     fun onOrderCompleted() {
         clearCart()
     }
+
+    // ---- Profile state ----
+    var profileName by mutableStateOf("")
+        private set
+
+    var profileUsername by mutableStateOf("")
+        private set
+
+    var profilePhone by mutableStateOf("")
+        private set
+
+    var profilePhotoEmoji by mutableStateOf("🧑")
+        private set
+
+    fun onProfileNameChange(value: String) { profileName = value }
+    fun onProfileUsernameChange(value: String) { profileUsername = value }
+    fun onProfilePhoneChange(value: String) { profilePhone = value }
+    fun onProfilePhotoChange(emoji: String) { profilePhotoEmoji = emoji }
 }
