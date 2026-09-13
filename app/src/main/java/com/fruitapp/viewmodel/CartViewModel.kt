@@ -45,6 +45,56 @@ class CartViewModel : ViewModel() {
     val cartCount: Int
         get() = cartItems.sumOf { it.quantity }
 
+    // ---- Delivery details (collected once via dialog before first Add to Cart) ----
+    var deliveryName by mutableStateOf("")
+        private set
+
+    var deliveryAddress by mutableStateOf("")
+        private set
+
+    var deliveryPhone by mutableStateOf("")
+        private set
+
+    fun onAddressChange(value: String) { deliveryAddress = value }
+    fun onPhoneChange(value: String) { deliveryPhone = value }
+    fun onDeliveryNameChange(value: String) { deliveryName = value }
+
+    val hasDeliveryDetails: Boolean
+        get() = deliveryName.isNotBlank() && deliveryPhone.isNotBlank() && deliveryAddress.isNotBlank()
+
+    // ---- Pending add-to-cart flow (shows details dialog first time) ----
+    var pendingFruit: Fruit? = null
+        private set
+    var pendingQuantity: Int = 1
+        private set
+
+    /** Call this from "+ Add" buttons instead of addToCart directly. */
+    fun requestAddToCart(fruit: Fruit, quantity: Int = 1) {
+        if (hasDeliveryDetails) {
+            repeat(quantity) { addToCart(fruit) }
+        } else {
+            pendingFruit = fruit
+            pendingQuantity = quantity
+        }
+    }
+
+    fun confirmDeliveryDetailsAndAddToCart(name: String, phone: String, address: String) {
+        deliveryName = name
+        deliveryPhone = phone
+        deliveryAddress = address
+        val fruit = pendingFruit
+        val qty = pendingQuantity
+        pendingFruit = null
+        if (fruit != null) {
+            repeat(qty) { addToCart(fruit) }
+        }
+    }
+
+    fun cancelPendingAddToCart() {
+        pendingFruit = null
+        pendingQuantity = 1
+    }
+
     fun addToCart(fruit: Fruit) {
         val current = _cartItems.value.toMutableList()
         val existingIndex = current.indexOfFirst { it.fruit.id == fruit.id }
@@ -86,15 +136,6 @@ class CartViewModel : ViewModel() {
     fun onPaymentMethodSelected(method: PaymentMethod) {
         selectedPaymentMethod = method
     }
-
-    var deliveryAddress by mutableStateOf("")
-        private set
-
-    var deliveryPhone by mutableStateOf("")
-        private set
-
-    fun onAddressChange(value: String) { deliveryAddress = value }
-    fun onPhoneChange(value: String) { deliveryPhone = value }
 
     var lastOrder: Order? = null
         private set
