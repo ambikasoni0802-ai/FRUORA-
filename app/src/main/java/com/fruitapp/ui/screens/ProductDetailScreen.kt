@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fruitapp.data.Fruit
+import com.fruitapp.ui.components.DeliveryDetailsDialog
 import com.fruitapp.ui.theme.BgTop
 import com.fruitapp.ui.theme.PinkMid
 import com.fruitapp.ui.theme.TextBrown
@@ -86,8 +87,10 @@ fun ProductDetailScreen(
             Spacer(Modifier.height(28.dp))
             Button(
                 onClick = {
-                    repeat(quantity) { viewModel.addToCart(fruit) }
-                    onGoToCart()
+                    viewModel.requestAddToCart(fruit, quantity)
+                    if (viewModel.hasDeliveryDetails) {
+                        onGoToCart()
+                    }
                 },
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = PinkMid),
@@ -96,6 +99,20 @@ fun ProductDetailScreen(
                 Text("Add to Cart — ₹${(fruit.price * quantity).toInt()}", fontSize = 16.sp)
             }
         }
+    }
+
+    val pending = viewModel.pendingFruit
+    if (pending != null) {
+        DeliveryDetailsDialog(
+            initialName = viewModel.deliveryName,
+            initialPhone = viewModel.deliveryPhone,
+            initialAddress = viewModel.deliveryAddress,
+            onConfirm = { name, phone, address ->
+                viewModel.confirmDeliveryDetailsAndAddToCart(name, phone, address)
+                onGoToCart()
+            },
+            onDismiss = { viewModel.cancelPendingAddToCart() }
+        )
     }
 }
 
