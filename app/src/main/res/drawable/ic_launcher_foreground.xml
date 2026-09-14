@@ -4,7 +4,20 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Bold letter F shape -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,74C40,74 30,66 30,54C30,46 36,40 44,40C50,40 54,44 54,50C54,44 58,40 64,40C72,40 78,46 78,54C78,66 68,74 54,74Z" />
+        android:fillColor="#FF6F91"
+        android:pathData="M40,30 L75,30 L75,42 L54,42 L54,50 L70,50 L70,62 L54,62 L54,85 L40,85 Z" />
+
+    <!-- Small fruit dot accents -->
+    <path
+        android:fillColor="#7ED957"
+        android:pathData="M28,32 m-6,0 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0" />
+    <path
+        android:fillColor="#FFA94D"
+        android:pathData="M80,40 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0" />
+    <path
+        android:fillColor="#C86DD7"
+        android:pathData="M30,78 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0" />
 </vector>
