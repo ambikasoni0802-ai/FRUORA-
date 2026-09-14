@@ -12,7 +12,6 @@ import com.fruitapp.data.PaymentMethod
 
 class CartViewModel : ViewModel() {
 
-    // ---- Search & category state ----
     var searchQuery by mutableStateOf("")
         private set
 
@@ -35,7 +34,6 @@ class CartViewModel : ViewModel() {
         searchQuery = ""
     }
 
-    // ---- Cart state ----
     private val _cartItems = mutableStateOf<List<CartItem>>(emptyList())
     val cartItems: List<CartItem> get() = _cartItems.value
 
@@ -45,7 +43,6 @@ class CartViewModel : ViewModel() {
     val cartCount: Int
         get() = cartItems.sumOf { it.quantity }
 
-    // ---- Delivery details (collected once via dialog before first Add to Cart) ----
     var deliveryName by mutableStateOf("")
         private set
 
@@ -62,13 +59,12 @@ class CartViewModel : ViewModel() {
     val hasDeliveryDetails: Boolean
         get() = deliveryName.isNotBlank() && deliveryPhone.isNotBlank() && deliveryAddress.isNotBlank()
 
-    // ---- Pending add-to-cart flow (shows details dialog first time) ----
-    var pendingFruit: Fruit? = null
-        private set
-    var pendingQuantity: Int = 1
+    var pendingFruit by mutableStateOf<Fruit?>(null)
         private set
 
-    /** Call this from "+ Add" buttons instead of addToCart directly. */
+    var pendingQuantity by mutableStateOf(1)
+        private set
+
     fun requestAddToCart(fruit: Fruit, quantity: Int = 1) {
         if (hasDeliveryDetails) {
             repeat(quantity) { addToCart(fruit) }
@@ -129,7 +125,6 @@ class CartViewModel : ViewModel() {
         _cartItems.value = emptyList()
     }
 
-    // ---- Checkout state ----
     var selectedPaymentMethod by mutableStateOf(PaymentMethod.CASH_ON_DELIVERY)
         private set
 
@@ -156,7 +151,6 @@ class CartViewModel : ViewModel() {
         clearCart()
     }
 
-    // ---- Profile state ----
     var profileName by mutableStateOf("")
         private set
 
