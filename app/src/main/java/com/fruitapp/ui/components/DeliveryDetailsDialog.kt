@@ -1,20 +1,25 @@
 package com.fruitapp.ui.components
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.Geocoder
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat
 import com.fruitapp.ui.theme.PinkMid
 import com.fruitapp.ui.theme.TextBrown
+import com.google.android.gms.location.LocationServices
+import java.util.Locale
 
 @Composable
 fun DeliveryDetailsDialog(
@@ -27,6 +32,73 @@ fun DeliveryDetailsDialog(
     var name by remember { mutableStateOf(initialName) }
     var phone by remember { mutableStateOf(initialPhone) }
     var address by remember { mutableStateOf(initialAddress) }
+    var isLocating by remember { mutableStateOf(false) }
+    var locationError by remember { mutableStateOf<String?>(null) }
+
+    val context = LocalContext.current
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+
+    fun fetchCurrentLocation() {
+        isLocating = true
+        locationError = null
+        try {
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location ->
+                    isLocating = false
+                    if (location != null) {
+                        try {
+                            val geocoder = Geocoder(context, Locale.getDefault())
+                            @Suppress("DEPRECATION")
+                            val results = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                            if (!results.isNullOrEmpty()) {
+                                val addr = results[0]
+                                val fullAddress = listOfNotNull(
+                                    addr.getAddressLine(0)
+                                ).joinToString(", ")
+                                address = fullAddress.ifBlank {
+                                    "Lat: ${location.latitude}, Lng: ${location.longitude}"
+                                }
+                            } else {
+                                address = "Lat: ${location.latitude}, Lng: ${location.longitude}"
+                            }
+                        } catch (e: Exception) {
+                            address = "Lat: ${location.latitude}, Lng: ${location.longitude}"
+                        }
+                    } else {
+                        locationError = "Could not get location. Make sure GPS is on."
+                    }
+                }
+                .addOnFailureListener {
+                    isLocating = false
+                    locationError = "Location fetch failed. Try again."
+                }
+        } catch (e: SecurityException) {
+            isLocating = false
+            locationError = "Location permission needed."
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            fetchCurrentLocation()
+        } else {
+            locationError = "Location permission denied."
+        }
+    }
+
+    fun onUseLocationClick() {
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (hasPermission) {
+            fetchCurrentLocation()
+        } else {
+            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
 
     val isValid = name.isNotBlank() && phone.length >= 10 && address.isNotBlank()
 
@@ -67,6 +139,29 @@ fun DeliveryDetailsDialog(
                     shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(Modifier.height(10.dp))
+
+                OutlinedButton(
+                    onClick = { onUseLocationClick() },
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (isLocating) {
+                        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Locating...")
+                    } else {
+                        Text("📍 Use My Current Location")
+                    }
+                }
+                if (locationError != null) {
+                    Text(
+                        locationError ?: "",
+                        color = androidx.compose.ui.graphics.Color.Red,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
                 Spacer(Modifier.height(10.dp))
 
                 OutlinedTextField(
