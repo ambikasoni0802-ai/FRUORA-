@@ -1,60 +1,50 @@
 package com.fruitapp.ui.components
 
-import android.graphics.Path
-import android.graphics.PathMeasure
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlin.random.Random
 
 @Composable
-fun FruitSLogo(
+fun FruitFLogo(
     modifier: Modifier = Modifier,
     sizeDp: Dp = 46.dp
 ) {
-    val fruits = listOf("🍎", "🍓", "🍇", "🍊", "🍌", "🍒", "🍋", "🍍", "🥝", "🍑")
-
     Canvas(modifier = modifier.size(sizeDp)) {
         val w = size.width
         val h = size.height
-        val sx = w / 100f
-        val sy = h / 100f
 
-        val path = Path().apply {
-            moveTo(78f * sx, 20f * sy)
-            cubicTo(78f * sx, 5f * sy, 22f * sx, 5f * sy, 22f * sx, 27f * sy)
-            cubicTo(22f * sx, 48f * sy, 78f * sx, 48f * sy, 78f * sx, 68f * sy)
-            cubicTo(78f * sx, 90f * sy, 22f * sx, 90f * sy, 22f * sx, 78f * sy)
-        }
+        drawRoundRect(
+            color = Color(0xFFFFD6E6),
+            cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.25f, h * 0.25f)
+        )
 
-        val measure = PathMeasure(path, false)
-        val pathLength = measure.length
-        val fruitCount = 100
-        val pos = FloatArray(2)
-        val tan = FloatArray(2)
+        val stroke = w * 0.16f
+        drawLine(
+            color = Color(0xFFFF6F91),
+            start = Offset(w * 0.35f, h * 0.22f),
+            end = Offset(w * 0.35f, h * 0.78f),
+            strokeWidth = stroke
+        )
+        drawLine(
+            color = Color(0xFFFF6F91),
+            start = Offset(w * 0.35f, h * 0.22f),
+            end = Offset(w * 0.72f, h * 0.22f),
+            strokeWidth = stroke
+        )
+        drawLine(
+            color = Color(0xFFFF6F91),
+            start = Offset(w * 0.35f, h * 0.50f),
+            end = Offset(w * 0.65f, h * 0.50f),
+            strokeWidth = stroke * 0.85f
+        )
 
-        drawIntoCanvas { canvas ->
-            val paint = android.graphics.Paint().apply {
-                textSize = w / 9f
-                isAntiAlias = true
-                textAlign = android.graphics.Paint.Align.CENTER
-            }
-
-            for (i in 0 until fruitCount) {
-                val dist = (i / (fruitCount - 1).toFloat()) * pathLength
-                measure.getPosTan(dist, pos, tan)
-                val nx = -tan[1]
-                val ny = tan[0]
-                val jitter = (Random.nextFloat() - 0.5f) * (w * 0.06f)
-                val fx = pos[0] + nx * jitter
-                val fy = pos[1] + ny * jitter
-                canvas.nativeCanvas.drawText(fruits[i % fruits.size], fx, fy, paint)
-            }
-        }
+        drawCircle(color = Color(0xFF7ED957), radius = w * 0.06f, center = Offset(w * 0.20f, h * 0.20f))
+        drawCircle(color = Color(0xFFFFA94D), radius = w * 0.05f, center = Offset(w * 0.80f, h * 0.30f))
+        drawCircle(color = Color(0xFFC86DD7), radius = w * 0.05f, center = Offset(w * 0.22f, h * 0.80f))
     }
 }
