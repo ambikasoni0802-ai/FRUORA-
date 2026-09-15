@@ -47,5 +47,8 @@ dependencies {
     // Razorpay checkout SDK (for Online Payment / UPI)
     implementation("com.razorpay:checkout:1.6.33")
 
+    // Google Play Services Location (for "Use My Current Location" feature)
+    implementation("com.google.android.gms:play-services-location:21.2.0")
+
     debugImplementation("androidx.compose.ui:ui-tooling:1.6.8")
 }
