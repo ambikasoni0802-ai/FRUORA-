@@ -1,6 +1,5 @@
 package com.fruitapp.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,7 +9,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items as lazyGridItems
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -18,18 +16,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.fruitapp.R
 import com.fruitapp.data.Fruit
 import com.fruitapp.data.FruitRepository
 import com.fruitapp.ui.components.DeliveryDetailsDialog
 import com.fruitapp.ui.components.FallingFruitsBackground
+import com.fruitapp.ui.components.FruitFLogo
 import com.fruitapp.ui.theme.*
 import com.fruitapp.viewmodel.CartViewModel
 
@@ -59,13 +55,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.logo_f_fruits),
-                            contentDescription = "Logo",
-                            modifier = Modifier
-                                .size(46.dp)
-                                .clip(CircleShape)
-                        )
+                        FruitFLogo(sizeDp = 46.dp)
                         BadgedBox(badge = {
                             Badge { Text("${viewModel.cartCount}") }
                         }) {
