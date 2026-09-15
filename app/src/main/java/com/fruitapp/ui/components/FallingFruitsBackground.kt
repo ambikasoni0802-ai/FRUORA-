@@ -1,20 +1,17 @@
 package com.fruitapp.ui.components
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import kotlin.random.Random
 
@@ -28,32 +25,40 @@ fun FallingFruitsBackground(
     val particles = remember {
         List(fruitCount) {
             Triple(
-                Random.nextFloat(),
-                Random.nextFloat(),
+                Random.nextFloat(),               // horizontal position seed
+                0.5f + Random.nextFloat(),         // individual speed multiplier
                 fruits[Random.nextInt(fruits.size)]
             )
         }
     }
 
-    val infiniteTransition = rememberInfiniteTransition(label = "falling")
-    val progress by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 8000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "fallProgress"
-    )
+    // elapsedSeconds keeps growing forever — it never resets, so nothing
+    // ever "restarts" all together. Each fruit just wraps on its own.
+    var elapsedSeconds by remember { mutableFloatStateOf(0f) }
+
+    LaunchedEffect(Unit) {
+        var lastNanos = 0L
+        while (true) {
+            withFrameNanos { nanos ->
+                if (lastNanos != 0L) {
+                    val deltaSeconds = (nanos - lastNanos) / 1_000_000_000f
+                    elapsedSeconds += deltaSeconds
+                }
+                lastNanos = nanos
+            }
+        }
+    }
 
     Canvas(modifier = modifier.fillMaxSize()) {
         val width = size.width
         val height = size.height
+        val cycleDuration = 8f // seconds for one fall at speed multiplier = 1
 
         particles.forEach { (xSeed, speedSeed, emoji) ->
             val x = xSeed * width
-            val fallSpeed = 0.5f + speedSeed
-            val y = ((progress * fallSpeed) % 1f) * (height + 100f) - 50f
+            // Each fruit's own progress, wraps individually — never a shared reset
+            val progress = (elapsedSeconds * speedSeed / cycleDuration) % 1f
+            val y = progress * (height + 100f) - 50f
 
             drawIntoCanvas { canvas ->
                 val paint = android.graphics.Paint().apply {
