@@ -1,26 +1,21 @@
 package com.fruitapp.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.fruitapp.R
 import com.fruitapp.ui.components.FallingFruitsBackground
+import com.fruitapp.ui.components.FruitFLogo
 import com.fruitapp.ui.theme.BgBottom
 import com.fruitapp.ui.theme.BgTop
 import com.fruitapp.ui.theme.TextBrown
@@ -47,13 +42,7 @@ fun SplashScreen(onFinished: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo_f_fruits),
-                contentDescription = "Logo",
-                modifier = Modifier
-                    .size(90.dp)
-                    .clip(CircleShape)
-            )
+            FruitFLogo(sizeDp = 90.dp)
             Text(
                 text = "Fresh fruits, delivered fast",
                 fontSize = 14.sp,
