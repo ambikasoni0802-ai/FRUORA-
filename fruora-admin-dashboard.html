@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FRUORA — Admin Dashboard</title>
+<style>
+  :root {
+    --pink: #FF6F91;
+    --orange: #FFB347;
+    --purple: #C86DD7;
+    --green: #3F8E6A;
+    --bg: #FFF9F0;
+    --card: #FFFFFF;
+    --ink: #4A3226;
+    --ink-soft: #8A7466;
+    --border: #F0E4D8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  header {
+    background: linear-gradient(120deg, var(--orange), var(--pink), var(--purple));
+    padding: 28px 24px 60px;
+    color: white;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  header p {
+    margin: 6px 0 0;
+    opacity: 0.92;
+    font-size: 14px;
+  }
+  .wrap {
+    max-width: 960px;
+    margin: -36px auto 40px;
+    padding: 0 16px;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(90, 50, 30, 0.08);
+  }
+  .stat-card .num {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--pink);
+  }
+  .stat-card .label {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 2px;
+  }
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .tab-btn {
+    border: none;
+    background: white;
+    color: var(--ink-soft);
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(90, 50, 30, 0.06);
+  }
+  .tab-btn.active {
+    background: var(--pink);
+    color: white;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .order-card, .customer-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 6px 20px rgba(90, 50, 30, 0.07);
+  }
+  .order-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .order-name {
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .order-phone {
+    color: var(--ink-soft);
+    font-size: 13px;
+    margin-top: 2px;
+  }
+  .order-amount {
+    font-weight: 800;
+    color: var(--green);
+    font-size: 16px;
+    white-space: nowrap;
+  }
+  .order-meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .badge.new { background: #FFEAD6; color: #B5651D; }
+  .badge.cod { background: #E8F5E9; color: var(--green); }
+  .badge.online { background: #F3E5F5; color: var(--purple); }
+  .order-address {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+  .order-items {
+    margin-top: 10px;
+    border-top: 1px dashed var(--border);
+    padding-top: 10px;
+    font-size: 13px;
+  }
+  .order-item-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    color: var(--ink);
+  }
+  .order-time {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+  }
+
+  .customer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .customer-name { font-weight: 700; font-size: 15px; }
+  .customer-detail-row {
+    display: flex;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+  .customer-detail-row b { color: var(--ink); font-weight: 600; }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-soft);
+  }
+  .empty-state .emoji { font-size: 40px; margin-bottom: 10px; }
+
+  .status-line {
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-soft);
+    padding: 10px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🍇 FRUORA Admin</h1>
+  <p>Live orders and customer details, updated in real time</p>
+</header>
+
+<div class="wrap">
+  <div class="stats">
+    <div class="stat-card">
+      <div class="num" id="statOrders">–</div>
+      <div class="label">Total Orders</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statRevenue">–</div>
+      <div class="label">Total Revenue</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="statCustomers">–</div>
+      <div class="label">Customers</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="orders">Orders</button>
+    <button class="tab-btn" data-tab="customers">Customers</button>
+  </div>
+
+  <div id="ordersPanel" class="panel active">
+    <div id="ordersList"></div>
+  </div>
+
+  <div id="customersPanel" class="panel">
+    <div id="customersList"></div>
+  </div>
+
+  <div class="status-line" id="statusLine">Connecting to database…</div>
+</div>
+
+<!-- Firebase (compat SDK, works with plain <script> tags) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQgoVINZsPuIMejbFSZbc0iKzN1Ov50To",
+    authDomain: "fruora-22220.firebaseapp.com",
+    projectId: "fruora-22220",
+    storageBucket: "fruora-22220.firebasestorage.app",
+    messagingSenderId: "657690155271",
+    appId: "1:657690155271:web:3c0f7aee098d2c32b54da2"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const ordersListEl = document.getElementById('ordersList');
+  const customersListEl = document.getElementById('customersList');
+  const statusLine = document.getElementById('statusLine');
+  const statOrders = document.getElementById('statOrders');
+  const statRevenue = document.getElementById('statRevenue');
+  const statCustomers = document.getElementById('statCustomers');
+
+  function formatRupees(amount) {
+    return '₹' + Math.round(amount || 0).toLocaleString('en-IN');
+  }
+
+  function formatTime(ts) {
+    if (!ts || !ts.toDate) return '';
+    const d = ts.toDate();
+    return d.toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+
+  function renderOrders(docs) {
+    if (docs.length === 0) {
+      ordersListEl.innerHTML = '<div class="empty-state"><div class="emoji">📦</div>No orders yet — they will appear here the moment a customer checks out.</div>';
+      statOrders.textContent = '0';
+      statRevenue.textContent = formatRupees(0);
+      return;
+    }
+
+    let totalRevenue = 0;
+    ordersListEl.innerHTML = docs.map(doc => {
+      const o = doc.data();
+      totalRevenue += (o.totalAmount || 0);
+      const isOnline = (o.paymentMethod || '').toUpperCase().includes('ONLINE');
+      const itemsHtml = (o.items || []).map(it =>
+        `<div class="order-item-row"><span>${it.emoji || ''} ${it.fruitName} × ${it.quantity}</span><span>${formatRupees(it.itemTotal)}</span></div>`
+      ).join('');
+
+      return `
+        <div class="order-card">
+          <div class="order-top">
+            <div>
+              <div class="order-name">${o.customerName || 'Unknown'}</div>
+              <div class="order-phone">📞 ${o.customerPhone || '—'}</div>
+            </div>
+            <div class="order-amount">${formatRupees(o.totalAmount)}</div>
+          </div>
+          <div class="order-meta">
+            <span class="badge new">${o.status || 'New'}</span>
+            <span class="badge ${isOnline ? 'online' : 'cod'}">${isOnline ? '💳 Online Payment' : '💵 Cash on Delivery'}</span>
+          </div>
+          <div class="order-address">📍 ${o.customerAddress || '—'}</div>
+          <div class="order-items">${itemsHtml}</div>
+          <div class="order-time">${formatTime(o.timestamp)}</div>
+        </div>
+      `;
+    }).join('');
+
+    statOrders.textContent = docs.length;
+    statRevenue.textContent = formatRupees(totalRevenue);
+  }
+
+  function renderCustomers(docs) {
+    if (docs.length === 0) {
+      customersListEl.innerHTML = '<div class="empty-state"><div class="emoji">👤</div>No customer profiles saved yet.</div>';
+      statCustomers.textContent = '0';
+      return;
+    }
+
+    customersListEl.innerHTML = docs.map(doc => {
+      const c = doc.data();
+      return `
+        <div class="customer-card">
+          <div class="customer-top">
+            <div class="customer-name">${c.name || 'Unnamed'}</div>
+          </div>
+          <div class="customer-detail-row"><b>Username:</b> ${c.username || '—'}</div>
+          <div class="customer-detail-row"><b>Phone:</b> ${c.phone || '—'}</div>
+          <div class="customer-detail-row"><b>Address:</b> ${c.address || '—'}</div>
+          <div class="customer-detail-row"><b>DOB:</b> ${c.dob || '—'} &nbsp; <b>Gender:</b> ${c.gender || '—'}</div>
+        </div>
+      `;
+    }).join('');
+
+    statCustomers.textContent = docs.length;
+  }
+
+  db.collection('orders').orderBy('timestamp', 'desc')
+    .onSnapshot(snapshot => {
+      renderOrders(snapshot.docs);
+      statusLine.textContent = 'Live — last updated ' + new Date().toLocaleTimeString('en-IN');
+    }, err => {
+      statusLine.textContent = 'Connection error: ' + err.message;
+    });
+
+  db.collection('customers')
+    .onSnapshot(snapshot => {
+      renderCustomers(snapshot.docs);
+    }, err => {
+      console.error(err);
+    });
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab + 'Panel').classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
