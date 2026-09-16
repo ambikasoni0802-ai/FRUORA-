@@ -41,6 +41,8 @@ fun ProfileScreen(
         }
     }
 
+    var showLogoutConfirm by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -197,6 +199,39 @@ fun ProfileScreen(
             modifier = Modifier.fillMaxWidth().height(50.dp)
         ) {
             Text("Save Profile", fontSize = 16.sp)
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        OutlinedButton(
+            onClick = { showLogoutConfirm = true },
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+            modifier = Modifier.fillMaxWidth().height(50.dp)
+        ) {
+            Text("Logout", fontSize = 16.sp)
+        }
+
+        if (showLogoutConfirm) {
+            AlertDialog(
+                onDismissRequest = { showLogoutConfirm = false },
+                title = { Text("Logout?") },
+                text = { Text("This will clear your saved profile details from this device. You'll need to fill them in again next time.") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModel.logout()
+                        showLogoutConfirm = false
+                        onBack()
+                    }) {
+                        Text("Logout", color = Color.Red)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showLogoutConfirm = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
 
         Spacer(Modifier.height(40.dp))
