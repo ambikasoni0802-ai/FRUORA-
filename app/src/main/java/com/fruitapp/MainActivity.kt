@@ -57,7 +57,13 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
             items = cartViewModel.cartItems,
             totalAmount = cartViewModel.cartTotal,
             paymentMethod = cartViewModel.selectedPaymentMethod.name,
-            onFailure = { e -> e.printStackTrace() }
+            onSuccess = {
+                Toast.makeText(this, "✅ Order saved to database", Toast.LENGTH_LONG).show()
+            },
+            onFailure = { e ->
+                e.printStackTrace()
+                Toast.makeText(this, "❌ Save failed: ${e.message}", Toast.LENGTH_LONG).show()
+            }
         )
     }
 
