@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items as lazyGridItems
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -16,11 +17,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.fruitapp.data.Fruit
 import com.fruitapp.data.FruitRepository
 import com.fruitapp.ui.components.DeliveryDetailsDialog
@@ -194,7 +198,7 @@ fun HomeScreen(
                 BottomNavItem("🏠", "Home", isActive = true) {}
                 BottomNavItem("🍇", "Fruits", isActive = false) { viewModel.onCategorySelected("All") }
                 BottomNavItem("🛒", "Cart", isActive = false) { onCartClick() }
-                BottomNavItem("👤", "Profile", isActive = false) { onProfileClick() }
+                ProfileNavItem(viewModel.profilePhotoUri, isActive = false, onClick = onProfileClick)
             }
         }
 
@@ -222,6 +226,33 @@ private fun BottomNavItem(icon: String, label: String, isActive: Boolean, onClic
         Text(icon, fontSize = 20.sp)
         Text(
             label,
+            fontSize = 11.sp,
+            color = if (isActive) PinkMid else Color(0xFFCCCCCC),
+            fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal
+        )
+    }
+}
+
+@Composable
+private fun ProfileNavItem(photoUri: String?, isActive: Boolean, onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable { onClick() }
+    ) {
+        if (photoUri != null) {
+            AsyncImage(
+                model = photoUri,
+                contentDescription = "Profile",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(22.dp)
+                    .clip(CircleShape)
+            )
+        } else {
+            Text("👤", fontSize = 20.sp)
+        }
+        Text(
+            "Profile",
             fontSize = 11.sp,
             color = if (isActive) PinkMid else Color(0xFFCCCCCC),
             fontWeight = if (isActive) FontWeight.Bold else FontWeight.Normal
