@@ -44,11 +44,9 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
 
-    // Razorpay checkout SDK (for Online Payment / UPI)
     implementation("com.razorpay:checkout:1.6.33")
-
-    // Google Play Services Location (for "Use My Current Location" feature)
     implementation("com.google.android.gms:play-services-location:21.2.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling:1.6.8")
 }
