@@ -151,6 +151,7 @@ class CartViewModel : ViewModel() {
         clearCart()
     }
 
+    // ---- Profile state ----
     var profileName by mutableStateOf("")
         private set
 
@@ -160,11 +161,41 @@ class CartViewModel : ViewModel() {
     var profilePhone by mutableStateOf("")
         private set
 
-    var profilePhotoEmoji by mutableStateOf("🧑")
+    var profileAddress by mutableStateOf("")
+        private set
+
+    var profileDob by mutableStateOf("")
+        private set
+
+    var profileGender by mutableStateOf("")
+        private set
+
+    var profilePhotoUri by mutableStateOf<String?>(null)
         private set
 
     fun onProfileNameChange(value: String) { profileName = value }
     fun onProfileUsernameChange(value: String) { profileUsername = value }
     fun onProfilePhoneChange(value: String) { profilePhone = value }
-    fun onProfilePhotoChange(emoji: String) { profilePhotoEmoji = emoji }
+    fun onProfileAddressChange(value: String) { profileAddress = value }
+    fun onProfileDobChange(value: String) { profileDob = value }
+    fun onProfileGenderChange(value: String) { profileGender = value }
+    fun onProfilePhotoChange(uri: String?) { profilePhotoUri = uri }
+
+    // ---- Onboarding survey (5 questions) ----
+    var surveyReason by mutableStateOf("")
+        private set
+    var surveyFrequency by mutableStateOf("")
+        private set
+    var surveyPreference by mutableStateOf("")
+        private set
+    var surveyHeardFrom by mutableStateOf("")
+        private set
+    var surveyDeliveryTime by mutableStateOf("")
+        private set
+
+    fun onSurveyReasonChange(value: String) { surveyReason = value }
+    fun onSurveyFrequencyChange(value: String) { surveyFrequency = value }
+    fun onSurveyPreferenceChange(value: String) { surveyPreference = value }
+    fun onSurveyHeardFromChange(value: String) { surveyHeardFrom = value }
+    fun onSurveyDeliveryTimeChange(value: String) { surveyDeliveryTime = value }
 }
