@@ -1,16 +1,20 @@
 package com.fruitapp.viewmodel
 
+import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import com.fruitapp.data.CartItem
 import com.fruitapp.data.Fruit
 import com.fruitapp.data.FruitRepository
 import com.fruitapp.data.Order
 import com.fruitapp.data.PaymentMethod
 
-class CartViewModel : ViewModel() {
+class CartViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val prefs = application.getSharedPreferences("fruit_app_profile", Context.MODE_PRIVATE)
 
     var searchQuery by mutableStateOf("")
         private set
@@ -151,7 +155,7 @@ class CartViewModel : ViewModel() {
         clearCart()
     }
 
-    // ---- Profile state ----
+    // ---- Profile state (persisted to disk so it survives app restarts) ----
     var profileName by mutableStateOf("")
         private set
 
@@ -173,13 +177,57 @@ class CartViewModel : ViewModel() {
     var profilePhotoUri by mutableStateOf<String?>(null)
         private set
 
-    fun onProfileNameChange(value: String) { profileName = value }
-    fun onProfileUsernameChange(value: String) { profileUsername = value }
-    fun onProfilePhoneChange(value: String) { profilePhone = value }
-    fun onProfileAddressChange(value: String) { profileAddress = value }
-    fun onProfileDobChange(value: String) { profileDob = value }
-    fun onProfileGenderChange(value: String) { profileGender = value }
-    fun onProfilePhotoChange(uri: String?) { profilePhotoUri = uri }
+    var isLoggedIn by mutableStateOf(false)
+        private set
+
+    init {
+        loadProfileFromDisk()
+    }
+
+    private fun loadProfileFromDisk() {
+        profileName = prefs.getString("name", "") ?: ""
+        profileUsername = prefs.getString("username", "") ?: ""
+        profilePhone = prefs.getString("phone", "") ?: ""
+        profileAddress = prefs.getString("address", "") ?: ""
+        profileDob = prefs.getString("dob", "") ?: ""
+        profileGender = prefs.getString("gender", "") ?: ""
+        profilePhotoUri = prefs.getString("photoUri", null)
+        isLoggedIn = prefs.getBoolean("isLoggedIn", false)
+    }
+
+    private fun saveProfileToDisk() {
+        prefs.edit()
+            .putString("name", profileName)
+            .putString("username", profileUsername)
+            .putString("phone", profilePhone)
+            .putString("address", profileAddress)
+            .putString("dob", profileDob)
+            .putString("gender", profileGender)
+            .putString("photoUri", profilePhotoUri)
+            .putBoolean("isLoggedIn", isLoggedIn)
+            .apply()
+    }
+
+    fun onProfileNameChange(value: String) { profileName = value; isLoggedIn = true; saveProfileToDisk() }
+    fun onProfileUsernameChange(value: String) { profileUsername = value; isLoggedIn = true; saveProfileToDisk() }
+    fun onProfilePhoneChange(value: String) { profilePhone = value; isLoggedIn = true; saveProfileToDisk() }
+    fun onProfileAddressChange(value: String) { profileAddress = value; isLoggedIn = true; saveProfileToDisk() }
+    fun onProfileDobChange(value: String) { profileDob = value; isLoggedIn = true; saveProfileToDisk() }
+    fun onProfileGenderChange(value: String) { profileGender = value; isLoggedIn = true; saveProfileToDisk() }
+    fun onProfilePhotoChange(uri: String?) { profilePhotoUri = uri; isLoggedIn = true; saveProfileToDisk() }
+
+    /** Explicit logout — the ONLY way profile data gets cleared. */
+    fun logout() {
+        profileName = ""
+        profileUsername = ""
+        profilePhone = ""
+        profileAddress = ""
+        profileDob = ""
+        profileGender = ""
+        profilePhotoUri = null
+        isLoggedIn = false
+        prefs.edit().clear().apply()
+    }
 
     // ---- Onboarding survey (5 questions) ----
     var surveyReason by mutableStateOf("")
