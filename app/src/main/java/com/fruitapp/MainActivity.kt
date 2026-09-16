@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.fruitapp.data.FirebaseOrderRepository
 import com.fruitapp.data.FruitRepository
 import com.fruitapp.ui.Routes
 import com.fruitapp.ui.screens.*
@@ -41,10 +42,23 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                 AppNavGraph(
                     navController = navController,
                     viewModel = cartViewModel,
-                    launchRazorpay = { amountInPaise -> startRazorpayCheckout(amountInPaise, navController) }
+                    launchRazorpay = { amountInPaise -> startRazorpayCheckout(amountInPaise, navController) },
+                    onOrderPlaced = { saveOrderToFirebase() }
                 )
             }
         }
+    }
+
+    private fun saveOrderToFirebase() {
+        FirebaseOrderRepository.saveOrder(
+            customerName = cartViewModel.deliveryName,
+            customerPhone = cartViewModel.deliveryPhone,
+            customerAddress = cartViewModel.deliveryAddress,
+            items = cartViewModel.cartItems,
+            totalAmount = cartViewModel.cartTotal,
+            paymentMethod = cartViewModel.selectedPaymentMethod.name,
+            onFailure = { e -> e.printStackTrace() }
+        )
     }
 
     private fun startRazorpayCheckout(amountInPaise: Int, navController: NavHostController) {
@@ -78,6 +92,7 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
     }
 
     override fun onPaymentSuccess(razorpayPaymentId: String?) {
+        saveOrderToFirebase()
         cartViewModel.placeOrder()
         cartViewModel.onOrderCompleted()
         onPaymentSuccess?.invoke()
@@ -92,7 +107,8 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
 fun AppNavGraph(
     navController: NavHostController,
     viewModel: CartViewModel,
-    launchRazorpay: (Int) -> Unit
+    launchRazorpay: (Int) -> Unit,
+    onOrderPlaced: () -> Unit
 ) {
     NavHost(navController = navController, startDestination = Routes.SPLASH) {
 
@@ -137,6 +153,7 @@ fun AppNavGraph(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
                 onPlaceOrderCOD = {
+                    onOrderPlaced()
                     viewModel.placeOrder()
                     viewModel.onOrderCompleted()
                     navController.navigate(Routes.ORDER_SUCCESS) { popUpTo(Routes.HOME) }
