@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "657690155271",
+    "project_id": "fruora-22220",
+    "storage_bucket": "fruora-22220.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:657690155271:android:e41049f7a9cb3bedb54da2",
+        "android_client_info": {
+          "package_name": "com.fruitapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWb1d9Wvb8YClnbiY9w8GzqJuR288bNgI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
